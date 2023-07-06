@@ -1,0 +1,147 @@
+import pygame
+from pygame.locals import *
+import time
+from pygame import key
+import pygame.sprite 
+import random
+from PIL import Image, ImageFilter
+import numpy as np
+from time import sleep
+import customtkinter
+import tkinter as tk
+import keyboard
+import pickle
+
+#info = pygame.display.Info()
+#info_tela_a = info.current_w
+#info_tela_l = info.current_h
+x = 1280
+y = 720
+tela = pygame.display.set_mode((x, y))
+def tela_inicio():
+    info = pygame.display.Info()
+    info_tela_a = info.current_w
+    info_tela_l = info.current_h
+    
+    x = info_tela_a
+    y = info_tela_l
+
+    tela = pygame.display.set_mode((x, y))
+
+    tela = pygame.display.set_mode((x, y))
+    info = pygame.display.Info()
+    info_tela_a = info.current_w
+    info_tela_l = info.current_h
+    fundo_inicio = pygame.image.load("D:\Prog\The runner\\fundos\\bg_mountain.png").convert()
+    tela.blit(fundo_inicio, (0, 0))
+
+    mensagem = "Aperte uma tecla para começar"
+    game_nick = 'Flaming Bloodbath'
+    fonte = pygame.font.Font('D:\Prog\The runner\Font\\pirates_3\\Pirates.otf',35)
+    fonte_nick = pygame.font.Font('D:\Prog\The runner\Font\\rumbling\\Rumbling.ttf',60)
+    
+    texto = fonte.render(mensagem, True, (255, 0, 0))
+    text_nick= fonte_nick.render(game_nick,True,(255,0,0))
+    
+    larg_text_nick = text_nick.get_width()
+    larg_texto = texto.get_width()
+    
+    tela.blit(texto, ((x - larg_texto) // 2, y // 2))
+    
+    alt_fundo_inicio = fundo_inicio.get_height()
+    alt_tela= tela.get_height()
+    pos_y_fundo_inicio = alt_fundo_inicio - alt_tela
+
+    pos_x_fundo_inicio = 0
+    pos_y_fundo_inicio = 0
+    fundo_velocidade = 1
+    
+    pos_x_texto = (x - larg_texto) // 2
+    pos_y_texto = y // 2
+    
+    pos_x_nick =  (x - larg_text_nick) // 2
+    pos_y_nick =  1
+
+    vol_intro= 1
+    intro_music = pygame.mixer.Sound('D:\Prog\The runner\Sounds\\intro_music.mp3')
+    intro_music.set_volume(vol_intro)
+    intro_music.play(-1) 
+      
+    show_text = True
+    last_time = time.time()
+    interval = 0.6
+    bg_rep = False
+    
+    loop1 = True
+    while loop1:
+        for event in pygame.event.get():
+            if event.type == QUIT:   
+                pygame.quit()
+                return
+            if event.type == KEYUP:
+                if event.key != K_F7 and event.key != K_ESCAPE:
+                    intro_music.stop()
+                    return
+                if event.key == K_F7:
+                    if not bg_rep:
+                        tela = pygame.display.set_mode((info_tela_a,info_tela_l),pygame.FULLSCREEN) 
+                    else:
+                        tela = pygame.display.set_mode((info_tela_a,info_tela_l))
+                    bg_rep = not bg_rep                           
+        current_time = time.time()
+        if current_time - last_time >= interval:
+              show_text = not show_text
+              last_time = current_time
+            
+        tela.blit(fundo_inicio, (pos_x_fundo_inicio, pos_y_fundo_inicio))
+
+        pos_x_fundo_inicio -= fundo_velocidade
+        if pos_x_fundo_inicio <= -fundo_inicio.get_width():
+            pos_x_fundo_inicio = 0
+
+        if pos_x_fundo_inicio + fundo_inicio.get_width() < x:
+            tela.blit(fundo_inicio, (pos_x_fundo_inicio + fundo_inicio.get_width(), pos_y_fundo_inicio))
+        if bg_rep == True:
+            if show_text:
+                tela.blit(texto, (pos_x_texto , pos_y_texto))
+            tela.blit(text_nick, (pos_x_nick , pos_y_nick))
+        else:
+            if show_text:
+                tela.blit(texto, (pos_x_texto, pos_y_texto))
+            tela.blit(text_nick, (pos_x_nick, pos_y_nick))  
+        pygame.display.update()
+    
+def game_over():
+    pygame.init()
+    info1 = pygame.display.Info()
+    info_tela_a = info1.current_w
+    info_tela_l = info1.current_h
+    
+    tela = pygame.display.set_mode((info_tela_a,info_tela_l))
+    bg_gameover = pygame.image.load("D:\Prog\The runner\\fundos\\1052.jpg")
+    bg_gameover = pygame.transform.scale(bg_gameover,(info_tela_a,info_tela_l))
+    
+    msg_gameover = "GAME OVER"
+    fonte_gameover = pygame.font.Font("D:\Prog\The runner\Font\melted_monster\Melted Monster.ttf",60)
+    msg_render_gameover = fonte_gameover.render(msg_gameover,True,(255,0,0))
+    game_over_larg = msg_render_gameover.get_width()
+    
+    bg_rep = False
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+        
+            if event.type == KEYUP:
+                if event.key == K_F7:
+                    if not bg_rep:
+                        tela = pygame.display.set_mode((info_tela_a,info_tela_l),pygame.FULLSCREEN) 
+                    else:
+                        tela = pygame.display.set_mode((info_tela_a,info_tela_l))
+                    bg_rep = not bg_rep
+            
+        tela.blit(bg_gameover,(0,0))
+        tela.blit(msg_render_gameover,((x - game_over_larg)//2,y //2))
+        
+        pygame.display.flip()
+        pygame.display.update()
