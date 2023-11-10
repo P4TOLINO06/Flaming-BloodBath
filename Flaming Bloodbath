@@ -1,20 +1,18 @@
 import pygame
 from pygame.locals import *
 import random
-from defs import tela_inicio,screen_login
-from time import sleep
+from defs import tela_inicio
 import time
 from PySimpleGUI import *
 from customtkinter import *
 import customtkinter
 import tkinter as tk
 from customtkinter import CTk as ctk
-from customtkinter import CTk
-import keyboard
 from PIL import ImageTk, Image
-from tkinter import Tk, Label,Canvas,messagebox
+from tkinter import messagebox
 from tkinter.font import Font
 import pyglet
+import math
 
 reiniciar = False
 hearts = 0
@@ -24,16 +22,24 @@ loop1 = True
 email_value = ""
 num_coins = 0
 senha_value = ""
-email_entry = ""
+#email_entry = ""
 senha_entry = ""
 tot_coins = 0
+nick_value = ""
+pass_value = ""
+control = True
+nick_bol = False
+nick_control = ""
+check_box_check = False
+login_successful = False
+coins_info = 0
 
 pyglet.font.add_file("D:\Prog\The runner\Font\sneaker\SNEAKER.ttf")
 def play_game():
     pygame.mixer.pre_init(44100, -16, 2, 2048) 
     pygame.init()
     pygame.mixer.init()
-    global tot_coins,num_coins,email_value,click,loop,reiniciar,triggered, vel_x_fire, pos_x_fire, pos_y_fire,game_over_play,cont,hearts,aliens,hearts_image,coin_image,coin_y,coin_x,esp_coin,esp_coin_time,last_time_coin,runner_mask,coin_over,coin_mask
+    global Button1,attack_boss_x,attack_boss_y,run_boss_sound,boss_sound_act,sound_alien_boss,bar_w,reduce_life_bar,break_alien_boss,continue_spawn_alien,cooldawn_dur_al,cooldawn_collision_al,cont_colision_ap,collision_ocurred,alien_boss_actv,life_alien,contr_alien_pos,contr_alien_pos_2,alien_boss_spw,damage,check_am_heart,run_col_life,check_col_heart,sound_col_heart,heart_image,porc_heart,time_heart_pass,last_time_heart,life_x,life_y,blit_fire,game_over_sound,spw_mov_alien,quit_check_clicked,back_contr,controls_true,contr_fullsr,sett_contr_click,back2_contr,check_click_sett,check_click_fs,vol_check,controls_contr_click,sett_contr,check_actions,game_pause,contr_menu,sound_bg_1_channel,coins_info,login_successful,check_box_check,nick_bol,control,nick_value,pass_value,tot_coins,num_coins,email_value,click,loop,reiniciar,triggered, vel_x_fire, pos_x_fire, pos_y_fire,game_over_play,cont,hearts,aliens,hearts_image,coin_image,coin_y,coin_x,esp_coin,esp_coin_time,last_time_coin,runner_mask,coin_over,coin_mask
     info = pygame.display.Info()
     info_tela_l = info.current_w
     info_tela_a = info.current_h
@@ -59,29 +65,31 @@ def play_game():
     #Sounds
     vol = 0.0080
     vol_fire = 0.01
-    fireball_effect = pygame.mixer.Sound("D:\Prog\The runner\Sounds\\fireball_effect.mp3")#Sound Fireball
+    fireball_effect = pygame.mixer.Sound("D:\Prog\The runner\Sounds\\20230922170009.mp3")#Sound Fireball
+    fire_channel = pygame.mixer.Channel(6)
     hit = pygame.mixer.Sound("D:\Prog\The runner\Sounds\\hit.mp3")#Colisão runner com alien
-    damage = pygame.mixer.Sound("D:\Prog\The runner\Sounds\\damage.mp3")
+    damage = pygame.mixer.music.load("D:\Prog\The runner\Sounds\\damage.mp3")
     alien_right = pygame.mixer.Sound("D:\Prog\The runner\Sounds\\alien_right.wav")
-    fireball_effect.set_volume(vol_fire)
-    hit.set_volume(vol)
-    damage.set_volume(vol)
-    bg_music = pygame.mixer.Sound('D:\Prog\The runner\Sounds\\medie_sound.mp3')#BackGround Music
+    hit.set_volume(0.1)
+    damage = pygame.mixer.music.set_volume(0.1)
     volbg = 0.04
+    fireball_effect.set_volume(0.1)
     alien_right.set_volume(0.02)
-    bg_music.set_volume(volbg)
     coin_sound = pygame.mixer.Sound("D:\Prog\The runner\Sounds\sound_coin.wav")
-    coin_sound.set_volume(volbg)
+    coin_sound.set_volume(0.1)
     game_over_play = False
     pop_restart = pygame.mixer.Sound("D:\Prog\The runner\Sounds\pop_restart.mp3")
     pop_restart.set_volume(0.04)
+    game_over_sound = pygame.mixer.Sound("D:\Prog\The runner\Sounds\game_over.mp3")
+    game_over_sound.set_volume(0.02) 
     def game_over_soundd():
+        global game_over_sound
         game_over_sound = pygame.mixer.Sound("D:\Prog\The runner\Sounds\game_over.mp3")
         game_over_sound.set_volume(0.02) 
         game_over_sound.play(maxtime=3500)
     def sound_coin():
         coin_sound.play()
-        
+      
     #fundos
     fundo = pygame.image.load("D:\Prog\The runner\\fundos\\back1.png").convert_alpha()
     fundo = pygame.transform.scale(fundo, (x, y))
@@ -98,19 +106,19 @@ def play_game():
     fundo5 = pygame.image.load("D:\Prog\The runner\\fundos\\back14.png")
     fundo5 = pygame.transform.scale(fundo5,(x,y))
 
-    fundo6 = pygame. image.load('D:\Prog\The runner\\fundos\\back10.png')
+    fundo6 = pygame.image.load('D:\Prog\The runner\\fundos\\back10.png')
     fundo6 = pygame.transform.scale(fundo6,(x,y))
 
-    fundo7 = pygame. image.load('D:\Prog\The runner\\fundos\\back11.png')
+    fundo7 = pygame.image.load('D:\Prog\The runner\\fundos\\back11.png')
     fundo7 = pygame.transform.scale(fundo7,(x,y))
 
-    fundo8 = pygame. image.load('D:\Prog\The runner\\fundos\\back12.png')
+    fundo8 = pygame.image.load('D:\Prog\The runner\\fundos\\back12.png')
     fundo8 = pygame.transform.scale(fundo8,(x,y))
 
-    fundo9 = pygame. image.load('D:\Prog\The runner\\fundos\\back17.png')
+    fundo9 = pygame.image.load('D:\Prog\The runner\\fundos\\back17.png')
     fundo9 = pygame.transform.scale(fundo9,(x,y))
 
-    fundo10 = pygame. image.load('D:\Prog\The runner\\fundos\\back15.png')
+    fundo10 = pygame.image.load('D:\Prog\The runner\\fundos\\back15.png')
     fundo10 = pygame.transform.scale(fundo10,(x,y))
 
     alt_tela = tela.get_height()
@@ -135,6 +143,7 @@ def play_game():
     runner_mask = pygame.mask.from_surface(runner) 
 
     runner_rect = pygame.Rect(0,0,0,0)
+    runner_blit_rect = runner.get_rect()
 
     runner_width = runner_rect.width 
     runner_height = runner_rect.height 
@@ -148,13 +157,16 @@ def play_game():
     runner_width1 = runner.get_width()
     runner_height1 = runner.get_height()
 
-    runner_rect.x= (runner.get_width()- rect_width_runner) //2
-    runner_rect.y = (runner.get_height() - rect_height_runner) //2
+    runner_rect.x= (runner.get_width()- rect_width_runner) -60
+    runner_rect.y = (runner.get_height() - rect_height_runner)+250
 
     life = pygame.image.load('D:\Prog\The runner\Images\\life.png')
     life = pygame.transform.scale(life, (50, 50))
     life_rect = pygame.Rect(50, 50, 160, 50)
-
+    life_mask = pygame.mask.from_surface(life)
+    larg_life = 50
+    life_x = random.randint(0,info_tela_a - larg_life)-100
+    life_y = -100
     hearts = 3
     hearts_image = [life,life,life]
 
@@ -203,7 +215,12 @@ def play_game():
 
     alien3_image = pygame.image.load("D:\Prog\The runner\\aliens\\alien3.png")
     alien3_image = pygame.transform.scale(alien3_image, (60, 60))
-
+    
+    alien4_image = pygame.image.load('D:\Prog\The runner\\aliens\\alien4.png')
+    alien4_image = pygame.transform.scale(alien4_image,(60,60))
+    
+    alien_boss_image = pygame.image.load('D:\Prog\The runner\\aliens\Boss.png')
+    alien_boss_image = pygame.transform.scale(alien_boss_image,(200,200))
     aliens = []
 
     # Comando fireball
@@ -211,7 +228,6 @@ def play_game():
     fireball = pygame.transform.scale(fireball, (20, 20))
 
     fireball_pos = None
-    fire_mask = pygame.mask.from_surface(fireball) 
 
     vel_x_fire = 0
     pos_y_fire = runner_rect.y
@@ -227,8 +243,7 @@ def play_game():
 
     fonte = pygame.font.Font(None,36)
     def screen_login():
-        global num_coins
-        #global width_root
+        global num_coins,email_entry,passw_entry,fram_bg,screen,login_successful
         screen = tk.Tk()
         width_root= screen.winfo_screenwidth()
         height_root= screen.winfo_screenheight()
@@ -242,55 +257,48 @@ def play_game():
         img_tk = ImageTk.PhotoImage(img_res)
         rot_bg = CTkLabel(master=screen, image=img_tk,text='',fg_color="black")
         rot_bg.pack(side="left", padx=0, pady=0)
-        font_name = Font(family="sneaker")#,weight="bold",slant="roman",underline=0,overstrike=0)
+        font_name = Font(family="sneaker")
         font_b = ('sneaker.ttf',10)
         
         fram_bg = customtkinter.CTkFrame(master=screen,width= 350,height=400)
         fram_bg.pack(side=RIGHT)
         
         def click():
-            global email_value,num_coins
+            global email_value,num_coins,nick_value,pass_value
             email_value = email_entry.get()  # Atualiza o valor de email_value
             senha_value = passw_entry.get()
-            num_coins = ver_cred(email_value)
+            nick_value = email_entry.get()
+            pass_value = passw_entry.get()
+            
             if num_coins is None:
                 num_coins = 0
-
-            if num_coins is not None:
-                print(f"As coins associadas ao email {email_value} são: {num_coins}")
-            else:
-                print("As credencias não existem")
-                print("Login")
+            if login_successful == True:
+                #num_coins = ver_cred(email_value)
                 print(email_value)
-            #num_coins += 1
-        save_info_coins(email_value,num_coins)
-           
+
+                if num_coins is not None:
+                    print(f"As coins associadas ao email {email_value} são: {num_coins}")
+                else:
+                    print("As credencias não existem")
+                    print("Login")
+                    print(email_value)
+            else:
+                print("falha")
+
         def save_login():
             global email_value,num_coins,senha_value
             email_value = email_entry.get()
             senha_value = passw_entry.get()  
-        
-        def ver_cred(email_value):
-            with open('coins.txt','r') as arquivo:
-                for line in arquivo:
-                    line = line.strip().split(':')
-                    if line[0] == email_value:
-                        return int(line[1])
-            #return 0  
-        
+            
         txt = customtkinter.CTkLabel(master=fram_bg,text="Login",font=("Comic Sans MS",20),text_color="lightsteelblue")
         txt.place(x=160,y=5)
         #txt.lift()
 
-        email_entry = customtkinter.CTkEntry(master=fram_bg,placeholder_text="Email: ",font=('Comic Sans MS',15),width= 230)
+        email_entry = customtkinter.CTkEntry(master=fram_bg,placeholder_text="Nick: ",font=('Comic Sans MS',15),width= 230)
         email_entry.place(x=90,y=40)
-        obg_text = customtkinter.CTkLabel(master=fram_bg,text="*Required field",text_color="red",font=('Comic Sans MS',10)).place(x=90,y=70)
-
+        
         passw_entry = customtkinter.CTkEntry(master=fram_bg,placeholder_text="Password: ",show= "*",font=("Comic Sans MS",15),width= 230)
-        passw_entry.place(x=90,y=100)
-
-        checkbox =customtkinter.CTkCheckBox(master=fram_bg,text= "Save Login",command= save_login,font=("Comic Sans MS",15),text_color="lightsteelblue")
-        checkbox.place(x=90,y=150)
+        passw_entry.place(x=90,y=90)
 
         label_tt = customtkinter.CTkLabel(master=screen,fg_color="#482f69",text= "Create or login to your account",font=("Comic Sans MS",20),text_color="gold")
         label_tt.place(x=20,y=0) 
@@ -302,8 +310,8 @@ def play_game():
             msg_login = messagebox.showinfo(title="Login Status",message="Successful Login")
                 
         
-        button = customtkinter.CTkButton(master=fram_bg, text= "Login",command= lambda:(click(),login_user()),font=("Comic Sans MS",20),width = 230,text_color="lightskyblue",fg_color="mediumslateblue",hover_color="#DAA520")
-        button.place(x=90,y=200)
+        button = customtkinter.CTkButton(master=fram_bg, text= "Login",command=lambda:(click(),comp_userdat()),font=("Comic Sans MS",20),width = 230,text_color="lightskyblue",fg_color="mediumslateblue",hover_color="#DAA520")
+        button.place(x=90,y=140)
         
         def empty_fild():
             global save_cad,clear_field
@@ -335,23 +343,37 @@ def play_game():
                 messagebox.showinfo(title = "Empty Fields",message=f"Please fill in the empty fields {fild_empty}")
                 return False
             
+            pass_var = pass_entry_sign.get()
+            if len(pass_var) < 8:
+                pass_var_contr = False
+                pass_var_msg = messagebox.showinfo(title="Short password",message="Enter a password that contains more than 8 characters")
+            else:
+                pass_var_contr = True
+                pass
+            
             #verification to check if the password and password confirmation fields are the same"
             if pass_entry_sign.get().strip() != passcon_entry_sign.get().strip():
                 screen.iconbitmap("D:\Prog\The runner\Images\download-removebg-preview_ico.ico")
                 messagebox.showinfo(title="Incorrect password",message="The passwords are different, please enter the same password in both fields")
-            
-            else:
-                #message "Successful Registration"
+            elif pass_var_contr == True:
                 screen.iconbitmap('D:\Prog\The runner\Images\images-removebg-preview.ico')
                 msg = messagebox.showinfo(title="Registration Status",message="Successful Registration")
                 def save_cad():#save players info
-                    with open('user_dat.txt', 'a') as file:
-                        file.write(f"NickName:{entry_nick.get()},Name: {name_entry_sign.get()} {lastname_entry_sign.get()}, Email: {email_entry_sign.get()}, Password: {pass_entry_sign.get()}\n")
-                screen_nick()            
+                    if nick_control == False:
+                        with open('user_dat.txt', 'a') as file:
+                            if entry_nick.get() == "":
+                                messagebox.showinfo(title="empty field",message="Please fill in the 'Nick' field")
+                            else:
+                                file.write(f"NickName:{entry_nick.get().strip().replace(' ','')},Name: {name_entry_sign.get().strip().replace(' ','')} {lastname_entry_sign.get().lower().strip().replace(' ','')}, Email: {email_entry_sign.get().lower().strip().replace(' ','')}, Password: {pass_entry_sign.get().strip().replace(' ','')}\n")
+                                clear_field()
+                                nick_msg_sucess = messagebox.showinfo(title="Nickname registration",message="Nickname successfully registered, press 'Finish' to complete your registration")
+                    elif nick_control == True:
+                        nick_control_msg = messagebox.showinfo(title="Existing nickname",message="Existing nickname, please enter another one")
+                screen_nick()         
             screen.iconbitmap("D:\Prog\The runner\Images\\vector-login-sign-icon-removebg-preview.ico") 
-        
+        print(login_successful) 
         def screen_sign():
-            global sign_fr,name_entry_sign,lastname_entry_sign,pass_entry_sign,email_entry_sign,passcon_entry_sign
+            global control,sign_fr,name_entry_sign,lastname_entry_sign,pass_entry_sign,email_entry_sign,passcon_entry_sign
             fram_bg.pack_forget()
             sign_fr = customtkinter.CTkFrame(master=screen,width=350,height=400)
             sign_fr.pack(side=RIGHT)
@@ -386,7 +408,7 @@ def play_game():
             button_continue.place(x=250,y=365)
         
         def screen_nick():
-            global nick_fr,entry_nick,sign_button_clicked
+            global nick_fr,entry_nick,sign_button_clicked,nick_bol
             nick_fr = customtkinter.CTkFrame(master=screen,width=350,height=400,fg_color='#17152A',bg_color='#17152A')
             sign_fr.pack_forget()
             fram_bg.pack_forget()
@@ -405,9 +427,29 @@ def play_game():
             button_finish = customtkinter.CTkButton(master=nick_fr,text="Finish",command=lambda:(finish_check()),width=100,font=('Comic Sans MS',20),text_color="ORANGE",fg_color="#9400d3",hover_color="skyblue")
             button_finish.place(x=250,y=368)
             
-            button_sign = customtkinter.CTkButton(master=nick_fr,command=lambda:(button_sign_clicked(),save_cad(),clear_field()),text= "Sign up",font=("Comic Sans MS",20),width = 230,text_color="lightskyblue",fg_color="#663399",hover_color="#DAA520")
+            button_sign = customtkinter.CTkButton(master=nick_fr,command=lambda:(button_sign_clicked(),nick_check(),save_cad()),text= "Sign up",font=("Comic Sans MS",20),width = 230,text_color="lightskyblue",fg_color="#663399",hover_color="#DAA520")
             button_sign.place(x=70,y=260)
-           
+            
+            def nick_check():
+                global nick_control
+                info_user_dat = None
+                nick_control = False
+                with open("user_dat.txt","r") as file:
+                    lines = file.readlines()
+                    info_entry_nick =entry_nick.get()
+                    info_entry_nick.lower().strip().replace(" ","")
+                    for line in lines:
+                        element =line.strip().split(",")
+                        info_user_dat = element[0].split(":")[1].strip()
+                        if info_user_dat == info_entry_nick:
+                            nick_control = True
+                            break
+                        else:
+                            nick_control = False
+                print(nick_control)
+                print(info_entry_nick)
+                print(info_user_dat)
+        
             def button_sign_clicked():
                 global sign_button_clicked
                 sign_button_clicked = True 
@@ -422,11 +464,10 @@ def play_game():
                 if not sign_button_clicked:
                     messagebox.showinfo(title="Unsaved information",message="Please, before finalizing, click on 'Sign up' to save the information")
                 else: 
-                    if sign_button_clicked:
+                    if sign_button_clicked and entry_nick.get() != "":
                         messagebox.showinfo(title="Successful Registration",message="Nickname and registration saved successfully. Now you can save your progress.Have fun and watch out for the aliens👽")
-                    back_nickfinish()
-            print(sign_button_clicked)
-            
+                        back_nickfinish()
+                      
         def back_nickfr():
             nick_fr.pack_forget()
             sign_fr.pack(side=RIGHT)
@@ -436,26 +477,80 @@ def play_game():
             sign_fr.pack_forget()
             fram_bg.pack(side=RIGHT)
             
-    
         button_cad = customtkinter.CTkButton(master=fram_bg, text= "Sign up",command= screen_sign,font=("Comic Sans MS",20),width = 230,text_color="lightskyblue",fg_color="#663399",hover_color="#DAA520")
-        button_cad.place(x=90,y=250)
+        button_cad.place(x=90,y=200)
         
         label_cad = customtkinter.CTkLabel(master=fram_bg,text="*If you don't have an account ⇧",font=("Comic Sans MS",14),width= 80,text_color="#2F4F4F")
-        label_cad.place(x=90,y=285)
+        label_cad.place(x=90,y=242)
 
         screen.configure(bg="black")
-        #screen.wm_attributes("-transparentcolor","purple")
         screen.mainloop()
     
+    def play_quit():
+        screen.destroy()
+    
+    def coins_blit():
+        global num_coins
+        num_coins = 0
+        with open('coins.txt','r') as arquivo:
+            for line in arquivo:
+                line = line.strip().split(':')
+                if line[0] == email_value:
+                    print(line[1])
+                    return int(line[1])    
+    print(f"numcoins:{num_coins}") 
+    def comp_userdat():
+        global button_play,control,var_login,coins_info,login_successful,num_coins
+        var_login = False
+        login_successful = False
+        with open("user_dat.txt","r") as file:
+            for line in file:
+                element =line.strip().split(",")
+                nick = element[0].split(":")[1].strip()
+                passwordd = element[3].split(":")[1].strip()
+                if nick_value == nick and passwordd == pass_value:
+                    control = True
+                    login_successful = True
+                    var_login = True
+                    break 
+        if login_successful == True:
+            num_coins = coins_blit()
+            msg_login = messagebox.showinfo(title="Login Status",message="Successful Login")  
+        else:
+            var_login = False
+            control = False
+            messagebox.showinfo(title="incorrect information",message="The information is incorrect or does not exist, please enter again")
+        if num_coins is None:
+            num_coins = 0
+        if num_coins == 0:
+            button_play = customtkinter.CTkButton(master=fram_bg,text="Start Journey",command=lambda:(play_quit(),info_error_login()),width=230,font=("Comic Sans MS",20),text_color="lightskyblue",fg_color="#663399",hover_color="#DAA520")
+            button_play.place(x=90,y=340)
+        if num_coins > 0:
+            button_continue = customtkinter.CTkButton(master=fram_bg,text="Continue the journey",command=play_quit,width=230,font=("Comic Sans MS",20),text_color="lightskyblue",fg_color="#663399",hover_color="#DAA520")
+            button_continue.place(x=90,y=340) 
+        
+    def nick_check():
+        global nick_bol
+        if nick_bol == True:
+            print("não")
+    nick_check()
+
+    def info_error_login():
+        global var_login
+        if var_login == False:
+            msg_info_errorlogin = messagebox.showinfo(title="Login error",message="You are not logged into an account, all progress will not be saved.")
+        else: 
+            var_login = True
+               
     def save_info_coins(email_value,num_coins):
+        global coins_info
         player_nick = email_value
-        passw = senha_value
         coins_info = num_coins
         
-        if email_value is None or senha_value is None or num_coins is None:
+        if email_value is None or num_coins is None:
             return 
+
         data = {}
- 
         try:                              
             with open("coins.txt","r") as arquivo:
                 coins = 0
@@ -472,7 +567,7 @@ def play_game():
         except FileNotFoundError:
             pass
         
-        if player_nick in data :
+        if player_nick in data:
             data[player_nick] += 1
         else:
             data[player_nick] = coins_info
@@ -481,7 +576,7 @@ def play_game():
             for nick,coins in data.items():
                 arquivo.write(f"{nick}:{coins}\n")
         arquivo.close()
-
+               
     def load_coins(email_value):
         try:
             with open ("coins.txt", "r") as arquivo:
@@ -504,71 +599,412 @@ def play_game():
         pos_x_fire = runner_rect.x
         pos_y_fire = runner_rect.y
         vel_x_fire = 0
-
-    cont = 0 #cont pontos
-
-    def verificar_quantidade_aliens():
-        if len(aliens) == 3:
-            return
-
-        if len(aliens) == 2:
-            # Escolha aleatória entre os três tipos de alien existentes
-            novo_alien = random.choice([alien_image, alien2_image, alien3_image])
-            novo_alien_rect = pygame.Rect(
-                x,
-                random.randint(0, alt_tela - novo_alien.get_height()),
-                novo_alien.get_width(),
-                novo_alien.get_height()
-            )
-            novo_alien_speed = random.randint(1, 4)
-
-            aliens.append({
-                'image': novo_alien,
-                'rect': novo_alien_rect,
-                'speed': novo_alien_speed
-            })
-            
-        if len(aliens) == 0:
-            for _ in range(3):
-                novo_alien = random.choice([alien_image, alien2_image, alien3_image])
-                novo_alien_rect = pygame.Rect(
-                    x,
-                    random.randint(0, alt_tela - novo_alien.get_height()),
-                    novo_alien.get_width(),
-                    novo_alien.get_height()
-                )
-                novo_alien_speed = random.randint(1, 4)
-
-                aliens.append({
-                    'image': novo_alien,
-                    'rect': novo_alien_rect,
-                    'speed': novo_alien_speed
-                })
-    cont_limit = 0          
-    def colisao():
-        global game_over_play,cont,hearts,aliens,hearts_image,coin_image,coin_y,coin_x,esp_coin,esp_coin_time,last_time_coin,runner_mask,coin_over,coin_mask
     
-        for alien in aliens:
-            alien_mask = pygame.mask.from_surface(alien['image'])
-            offset = (alien['rect'].x - runner_rect.x, alien['rect'].y - runner_rect.y)
-            if runner_mask.overlap(alien_mask, offset) is not None:
-                cont -= 1
-                hit.play()
-                aliens.remove(alien)
-                if hearts > 0:
-                    hearts -= 1
-                    hearts_image.pop()
-                if hearts == 0:   
-                    if not game_over_play:
-                        game_over_soundd()
-                        game_over_play = True
-            if alien ['rect'].right < 10:
-                alien_right.play()
-                cont -=1
-                aliens.remove(alien)
-        for alien in aliens:  
-            if fire_mask.overlap(alien_mask,offset) is not None: 
-                aliens.remove(alien)
+    porc_heart = False
+    sound_col_heart = pygame.mixer.Sound("D:\Prog\The runner\Sounds\SPLAT Crush 01.ogg")
+    sound_col_heart.set_volume(0.1)
+    def heart_drop_percent():
+        global porc_heart
+        drop_chance = 100
+        if random.randint(1,100) <= drop_chance:
+            drop_heart()
+        if hearts >=2 and cont < 10:
+            porc_heart = False
+        if hearts > 1 and cont > 10:
+            porc_heart = True
+        if hearts  >= 3:
+            porc_heart = False
+    def drop_heart():
+        global porc_heart,check_col_heart
+        porc_heart = True
+        check_col_heart = False
+        print("DROP HEART")
+            
+    alien_boss_spw = False
+    contr_alien_pos = False
+    contr_alien_pos_2 = False
+    alien_boss_actv = False
+    def sound_alien_boss():
+        sound_alien_boss_play = pygame.mixer.Sound('D:\Prog\The runner\Sounds\Monster_Growl3.mp3')
+        sound_alien_boss_channel = pygame.mixer.Channel(11)
+        sound_alien_boss_play.set_volume(0.02)
+        sound_alien_boss_channel.play(sound_alien_boss_play)
+            
+    font_life_boss = pygame.font.Font('D:\Prog\The runner\Font\\rough_battle\Rough Battle.ttf')
+    name_alien_boss = "MORGHUL"
+    render_name_boss = font_life_boss.render(name_alien_boss,True,("#C0C0C0"))
+    life_alien = 50
+    continue_spawn_alien = False
+    break_alien_boss = False
+    bar_color = (255,255,255)
+    fill_color = (255,0,0)
+    out_color = ('#2F4F4F')
+    bar_w = 250
+    bar_h = 20
+    bar_w_border = 250
+    bar_x = (info_tela_l - bar_w) //2 + 25
+    bar_y = (info_tela_a - bar_h)//2 - 300
+    pos_x_name_boss = (info_tela_l - bar_w) //2 + 25
+    reduce_life_bar = False
+    def draw_life_bar(health,max_health):
+        fill_width =(health/max_health) * bar_w
+        pygame.draw.rect(tela, fill_color, (bar_x, bar_y, fill_width, bar_h))
+        pygame.draw.rect(tela,out_color,(bar_x,bar_y,bar_w_border,bar_h),2)
+    run_boss_sound = 10 
+    boss_sound_act = time.time() 
+    def verificar_quantidade_aliens():
+        global run_boss_sound,boss_sound_act,break_alien_boss,continue_spawn_alien,alien_boss_actv,novo_alien,alien_boss_spw,random,contr_alien_pos,contr_alien_pos_2
+        if time.time() - boss_sound_act >= run_boss_sound and life_alien > 0 and alien_boss_spw == False and cont > 5:
+            sound_alien_boss() 
+            boss_sound_act += run_boss_sound   
+        if cont == 13 and life_alien > 0:
+            alien_boss_spw = True
+            contr_alien_pos = True
+        elif cont == 13 and life_alien <= 0:
+            alien_boss_spw = False
+            contr_alien_pos = False
+        if life_alien > 0:
+            continue_spawn_alien = False
+        elif life_alien <= 0:
+            continue_spawn_alien = True
+        if spw_mov_alien == True:
+            if alien_boss_spw == False:
+                if len(aliens) == 3:
+                    return
+                if continue_spawn_alien == False:
+                    if cont <= 10 or cont >= 14 and life_alien > 0:
+                        if len(aliens) == 2:
+                            for mn in range(1):
+                                #Escolha aleatória entre os três tipos de alien existentes
+                                novo_alien = random.choice([alien_image, alien2_image, alien3_image])
+                                if cont > 5:
+                                    novo_alien = random.choice([alien_image, alien2_image, alien3_image,alien4_image])
+                                if cont == 13 and life_alien >= 2:
+                                    novo_alien = random.choice([alien_boss_image])
+                                if cont == 13 and life_alien <= 0:
+                                    novo_alien = random.choice([alien_image, alien2_image, alien3_image,alien4_image])
+                                novo_alien_rect = pygame.Rect(
+                                    tela.get_width(),
+                                    random.randint(0, alt_tela - novo_alien.get_height()),
+                                    novo_alien.get_width(),
+                                    novo_alien.get_height()
+                                )
+                                novo_alien_speed = random.randint(1, 9)
+                                aliens.append({
+                                    'image': novo_alien,
+                                    'rect': novo_alien_rect,
+                                    'speed': novo_alien_speed
+                                })
+                if continue_spawn_alien == True:
+                    if cont == 13 and life_alien <= 0:
+                        if len(aliens) == 2:
+                            for mn in range(1):
+                                #Escolha aleatória entre os três tipos de alien existentes
+                                novo_alien = random.choice([alien_image, alien2_image, alien3_image])
+                                if cont == 13 and life_alien <= 0:
+                                    novo_alien = random.choice([alien_image, alien2_image, alien3_image,alien4_image])
+                                novo_alien_rect = pygame.Rect(
+                                    tela.get_width(),
+                                    random.randint(0, alt_tela - novo_alien.get_height()),
+                                    novo_alien.get_width(),
+                                    novo_alien.get_height()
+                                )
+                                novo_alien_speed = random.randint(1, 9)
+                                aliens.append({
+                                    'image': novo_alien,
+                                    'rect': novo_alien_rect,
+                                    'speed': novo_alien_speed
+                                })
+                if continue_spawn_alien == False:
+                    if cont <= 10 or cont >= 14 and life_alien > 0:     
+                        if len(aliens) == 0:
+                            for mn in range(3):
+                                novo_alien = random.choice([alien_image, alien2_image, alien3_image])
+                                if cont > 5:
+                                    novo_alien = random.choice([alien_image, alien2_image, alien3_image,alien4_image])
+                                if cont == 13 and life_alien >=2:
+                                    novo_alien = random.choice([alien_boss_image])
+                                elif cont == 13 and life_alien <= 0:
+                                    novo_alien = random.choice([alien_image, alien2_image, alien3_image,alien4_image])
+                                novo_alien_rect = pygame.Rect(
+                                    tela.get_width(),
+                                    random.randint(0, alt_tela - novo_alien.get_height()),
+                                    novo_alien.get_width(),
+                                    novo_alien.get_height()
+                                )
+                                novo_alien_speed = random.randint(1, 4)
+                                aliens.append({
+                                    'image': novo_alien,
+                                    'rect': novo_alien_rect,
+                                    'speed': novo_alien_speed
+                                })
+                if continue_spawn_alien == False:
+                    if cont <= 12 or cont >= 14 and life_alien > 0:     
+                        if len(aliens) == 0:
+                            for mn in range(1):
+                                novo_alien = random.choice([alien_image, alien2_image, alien3_image])
+                                if cont > 5:
+                                    novo_alien = random.choice([alien_image, alien2_image, alien3_image,alien4_image])
+                                if cont == 13 and life_alien >=2:
+                                    novo_alien = random.choice([alien_boss_image])
+                                elif cont == 13 and life_alien <= 0:
+                                    novo_alien = random.choice([alien_image, alien2_image, alien3_image,alien4_image])
+                                novo_alien_rect = pygame.Rect(
+                                    tela.get_width(),
+                                    random.randint(0, alt_tela - novo_alien.get_height()),
+                                    novo_alien.get_width(),
+                                    novo_alien.get_height()
+                                )
+                                novo_alien_speed = random.randint(1, 4)
+                                aliens.append({
+                                    'image': novo_alien,
+                                    'rect': novo_alien_rect,
+                                    'speed': novo_alien_speed
+                                })
+            if alien_boss_spw == True:
+                #boss_health = 150
+                #draw_life_bar(boss_health)
+                if len(aliens) == 0 and life_alien >= 2:
+                    alien_boss_actv = True
+                    for mn in range(1):
+                        novo_alien = random.choice([alien_boss_image])
+                        novo_alien_rect = pygame.Rect(
+                            tela.get_width(),
+                            random.randint(0, alt_tela - novo_alien.get_height()),
+                            novo_alien.get_width(),
+                            novo_alien.get_height()
+                        )
+                        novo_alien_speed = random.randint(1, 4)
+                        direction = random.choice([1,1])
+                        aliens.append({
+                            'image': novo_alien,
+                            'rect': novo_alien_rect,
+                            'speed': novo_alien_speed,
+                            'direction': direction
+                        })
+                            # Limitar a posição do alien dentro da tela
+                        if novo_alien_rect.y > tela.get_height()/4:
+                            novo_alien_rect.y = 50
+                            alien['rect'].x += alien['speed'] * direction
+                            print('passou')
+                        if novo_alien_rect.x > tela.get_width()/4:
+                            novo_alien_rect.x = 50
+                            alien['rect'].x += alien['speed'] * direction
+            if continue_spawn_alien == True:
+                if alien_boss_spw == False and life_alien <= 0:
+                    if len(aliens) == 2:
+                            for mn in range(1):
+                                #Escolha aleatória entre os três tipos de alien existentes
+                                if cont >= 12:
+                                    novo_alien = random.choice([alien_image, alien2_image, alien3_image])
+                                if cont <= 14:
+                                    novo_alien = random.choice([alien_image, alien2_image, alien3_image])
+                                novo_alien_rect = pygame.Rect(
+                                    tela.get_width(),
+                                    random.randint(0, alt_tela - novo_alien.get_height()),
+                                    novo_alien.get_width(),
+                                    novo_alien.get_height()
+                                )
+                                novo_alien_speed = random.randint(1, 9)
+                                aliens.append({
+                                    'image': novo_alien,
+                                    'rect': novo_alien_rect,
+                                    'speed': novo_alien_speed
+                                })
+            if continue_spawn_alien == True:
+                if alien_boss_spw == False and life_alien <= 0:
+                    if len(aliens) == 0:
+                            for mn in range(3):
+                                if cont >= 12:
+                                    novo_alien = random.choice([alien_image, alien2_image, alien3_image])
+                                if cont <= 14:
+                                    novo_alien = random.choice([alien_image, alien2_image, alien3_image])
+                                novo_alien_rect = pygame.Rect(
+                                    tela.get_width(),
+                                    random.randint(0, alt_tela - novo_alien.get_height()),
+                                    novo_alien.get_width(),
+                                    novo_alien.get_height()
+                                )
+                                novo_alien_speed = random.randint(1, 4)
+                                aliens.append({
+                                    'image': novo_alien,
+                                    'rect': novo_alien_rect,
+                                    'speed': novo_alien_speed
+                                })            
+    cont_limit = 0  
+    cont = 0 
+    fire_col_al = False  
+    blit_fire = False
+    time_heart_pass = False
+    last_time_heart = 0
+    esp_heart_time = 8000
+    vel_heart = 5
+    check_col_heart = False
+    run_col_life = False
+    check_am_heart = False
+    hit_play = False
+    collision_ocurred = False
+    cont_colision_ap = 3
+    cooldawn_collision_al = 0
+    cooldawn_dur_al = 5
+    
+    def colisao():
+        global bar_w,reduce_life_bar,cooldawn_collision_al,cooldawn_dur_al,collision_ocurred,novo_alien,alien_boss_spw,life_alien,damage,hit_play,check_am_heart,run_col_life,check_col_heart,sound_col_heart,heart_image,porc_heart,time_heart_pass,last_time_heart,life_y,life_x,fireball_pos,blit_fire,fire_mask,offset_fire,alien_mask,offset,pos_y_fire,triggered,game_over_play,vel_x_fire,pos_x_fire,cont,hearts,aliens,hearts_image,coin_image,coin_y,coin_x,esp_coin,esp_coin_time,last_time_coin,runner_mask,coin_over,coin_mask
+        print(life_alien)
+        if spw_mov_alien == True:
+            for alien in aliens:
+                alien_mask = pygame.mask.from_surface(alien['image'])
+                fire_mask = pygame.mask.from_surface(fireball) 
+                offset = (alien['rect'].x - runner_rect.x, alien['rect'].y - runner_rect.y)
+                offset_fire = (alien['rect'].x - fire_rect.x,alien['rect'].y - fire_rect.y)
+                if runner_mask.overlap(alien_mask, offset) is not None:
+                    if alien_boss_spw == False:
+                        cont -= 1 
+                        hit.play()
+                    if alien_boss_spw == False:              
+                        aliens.remove(alien)
+                    cool_dawn_time = time.time()
+                    if alien_boss_spw == True and life_alien > 0:
+                        if not collision_ocurred:
+                            if cool_dawn_time - cooldawn_collision_al >= cooldawn_dur_al:
+                                hit.play()
+                                if hearts > 0:
+                                    hearts -= 1
+                                    hearts_image.pop()
+                                    collision_ocurred = True
+                                    cooldawn_collision_al = cool_dawn_time
+                                collision_ocurred = False
+                    if alien_boss_spw == False:  
+                        if hearts > 0:
+                            hearts -= 1
+                            hearts_image.pop()        
+                    if hearts == 0:   
+                        if not game_over_play:
+                            game_over_soundd()
+                            game_over_play = True
+                    break
+                if alien ['rect'].right < 10:
+                    alien_right.play()
+                    cont -=1
+                    aliens.remove(alien)
+                if triggered:
+                    if alien_boss_spw == False and life_alien <= 0:
+                        if fire_mask.overlap(alien_mask,offset_fire) is not None:
+                            hit_play = True
+                            if hit_play == True:
+                                damage = pygame.mixer.music.play()
+                            blit_fire = False
+                            #if alien_boss_spw == False: 
+                            aliens.remove(alien)
+                            cont += 1
+                            triggered = False
+                            heart_drop_percent()
+                    if alien_boss_spw == True and life_alien > 0:
+                        if alien_boss_actv == True:
+                            #aliens.remove(alien)
+                            #novo_alien = alien_boss_image
+                            if fire_mask.overlap(alien_mask,offset_fire) is not None:
+                                hit_play = True
+                                life_alien -= 1
+                                bar_w -= 5
+                                reduce_life_bar = True
+                                if hit_play == True:
+                                    damage = pygame.mixer.music.play()
+                                blit_fire = False
+                                triggered = False
+                                heart_drop_percent()
+                                if life_alien <= 0 or cont >= 14:
+                                    aliens.remove(alien)
+                                    cont += 1
+                                    alien_boss_spw = False
+                            else:
+                                reduce_life_bar = False
+                            break
+                if triggered:
+                    if alien_boss_spw == False:
+                        if fire_mask.overlap(alien_mask,offset_fire) is not None:
+                            hit_play = True
+                            if hit_play == True:
+                                damage = pygame.mixer.music.play()
+                            blit_fire = False
+                            #if alien_boss_spw == False: 
+                            aliens.remove(alien)
+                            cont += 1
+                            triggered = False
+                            heart_drop_percent()
+                            break
+                    if alien_boss_spw == True:
+                        if alien_boss_actv == True:
+                            #aliens.remove(alien)
+                            #novo_alien = alien_boss_image
+                            if fire_mask.overlap(alien_mask,offset_fire) is not None:
+                                hit_play = True
+                                bar_w -= 5
+                                reduce_life_bar = True
+                                life_alien -= 1
+                                if hit_play == True:
+                                    damage = pygame.mixer.music.play()
+                                blit_fire = False
+                                triggered = False
+                                heart_drop_percent()
+                                if life_alien <= 0 or cont >= 14:
+                                    aliens.remove(alien)
+                                    cont += 1
+                                    alien_boss_spw = False
+                            else:
+                                reduce_life_bar = False
+                                break   
+                fireball_pos = (pos_x_fire+40, pos_y_fire + 40) #Define a posição da fireball
+                fire_rect.topleft= fireball_pos  
+        heart_over = (life_rect.x - runner_rect.x,life_rect.y - runner_rect.y)
+        if porc_heart == True:
+            if run_col_life == True:
+                if runner_mask.overlap(life_mask,heart_over):
+                    life_x = -300
+                    life_y = -300
+                    life_rect.x = life_x
+                    life_rect.y = life_y
+                    sound_col_heart.play()
+                    if hearts > 1:
+                        #check_am_heart = False
+                        hearts_image.append(life)
+                        tela.blit(heart_image, heart_rect)
+                        hearts += 1
+                    #if check_am_heart == False:
+                    if hearts < 2:
+                        hearts_image.append(life)
+                        tela.blit(heart_image,heart_rect)
+                        hearts += 1
+                        #check_am_heart = False
+                    #if hearts > 1:
+                        #check_am_heart = True
+                    #check_col_heart = True
+            life_rect.x = life_x
+            life_rect.y = life_y
+            if hearts < 2 and check_col_heart == False:
+                run_col_life = True
+                if life_x != -100 and life_y > -20:
+                    tela.blit(life,(life_x,life_y))
+            if hearts > 1 and check_col_heart == False and cont > 10:
+                run_col_life = True
+                if life_x != -100 and life_y > -20:
+                    tela.blit(life,(life_x,life_y))
+            if hearts > 1:
+                run_col_life = True
+            if life_y >= info_tela_a:
+                check_col_heart = True
+            timer_act_heart = pygame.time.get_ticks()
+            if not time_heart_pass:
+                if timer_act_heart - last_time_heart >= esp_heart_time:
+                    time_heart_pass = True
+                    last_time_heart = timer_act_heart
+                    life_y += vel_heart
+            if time_heart_pass:
+                life_y += vel_heart
+                if life_y > info_tela_a:
+                    life_x = random.randint(0,info_tela_a - larg_life)
+                    life_y = -100
+                    time_heart_pass = False
         coin_over =(coin_rect.x - runner_rect.x,coin_rect.y - runner_rect.y)
         if runner_mask.overlap(coin_mask,coin_over) is not None:
             coin_x = -300
@@ -593,7 +1029,11 @@ def play_game():
                 coin_x = random.randint(0,info_tela_a - larg_coin)
                 coin_y = -100
                 esp_coin = False
-            
+    
+    attack_boss_x = 0
+    attack_boss_y = 0
+    attack_speed = 5
+        
     bg_rep = False # Variavel para controle de VIDEORESIZABLE
     def cont_coin():
         global num_coins
@@ -607,7 +1047,288 @@ def play_game():
         if bg_rep == True:
             tela.blit(coin_text_render,(1080,10))
         if bg_rep == False:
-            tela.blit(coin_text_render,(1080,10))    
+            tela.blit(coin_text_render,(1080,10))   
+    
+    contr_menu = False
+    game_pause = False
+    check_actions = True
+    sett_contr_click = False
+    sett_contr = False
+    controls_contr_click = False
+    vol_check = False
+    check_click_sett = False
+    check_click_fs = True
+    contr_fullsr = False
+    back2_contr = False
+    controls_click = False
+    controls_true = False
+    back_contr = False
+    quit_check_clicked = False
+    check_close_home_screen = True
+    cont_shoot = 0.1
+    cont_damage_sound = 0.1
+    cont_sound_bg = 0.1
+    cont_sound_hit = 0.1
+    cont_sound_coin = 0.1
+    cont_sound_lostp = 0.1
+    cont_sound_heart = 0.1
+    class Button1():
+        global game_pause
+        def __init__(self,x,y,img):
+            self.img = img
+            self.rect = self.img.get_rect()
+            self.topleft = (x,y)
+            self.clicked = False
+            self.clicked_prev = False
+        
+        def draw1(self):
+            global contr_menu,pos_x_fire,controls_true,quit_check_clicked,back_contr,sett_contr_click,back2_contr,game_pause,check_actions,sett_contr,controls_contr_click,check_click_sett
+            pos = pygame.mouse.get_pos() 
+            if set_button_img_draw.rect.collidepoint(pos):
+                if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                    self.clicked = True
+                    contr_menu = True
+                    check_actions = False
+                    pos_x_fire += 700
+                    fireball_effect.stop()
+                elif pygame.mouse.get_pressed()[0] == 0:
+                    self.clicked = False
+            if controls_contr_click == True:
+                if control_img_button.rect.collidepoint(pos):
+                    if pygame.mouse.get_pressed()[0] == 1:
+                        game_pause = False
+                        check_actions = True
+                        contr_menu = False
+                        back2_contr = False
+                        back_contr = False
+            if sett_contr_click == True and contr_menu == True:
+                if sett_contr_button.rect.collidepoint(pos):
+                    if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                        contr_menu = False 
+                        sett_contr = True
+                        check_click_sett = True
+                        back2_contr = True
+            if back2_contr == True:
+                if back_2contr_button.rect.collidepoint(pos):
+                    if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                        contr_menu = True
+                        sett_contr = False
+                        check_click_sett = False
+                        sett_contr_click = False
+            if controls_click == True and contr_menu == True:
+                if controls_button.rect.collidepoint(pos):
+                    if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                        contr_menu = False
+                        controls_true = True
+                        back_contr = True
+            if back_contr == True:
+                if back_contr_button.rect.collidepoint(pos):
+                    if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                        contr_menu = True
+                        controls_true = False
+            if quit_check_clicked == True and contr_menu == True:
+                if quit_button.rect.collidepoint(pos):
+                    if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                        pygame.quit()
+            tela.blit(self.img,(self.rect.x,self.rect.y))
+            
+    largura_tela = tela.get_width()
+    altura_tela = tela.get_height()
+
+    larg_ret = 300
+    alt_ret = 300
+
+    xx = (largura_tela - larg_ret) // 2
+    yy= (altura_tela - alt_ret) // 2 
+    
+    set_button_img = pygame.image.load("D:\Prog\The runner\Images\Settings col_Square Button.png")
+    set_button_img = pygame.transform.scale(set_button_img,(40,40))
+    set_button_img_draw = Button1(300,300,set_button_img)  
+    set_button_img_draw.rect.x = xx -490
+    set_button_img_draw.rect.y = yy +470
+    continue_contr_img = pygame.image.load("D:\Prog\The runner\Images\Continue Button.png")     
+    continue_contr_img= pygame.transform.scale(continue_contr_img,(100,50))
+    control_img_button = Button1(300,300,continue_contr_img)
+    control_img_button.rect.x = xx +100
+    control_img_button.rect.y = yy +30
+    sett_img = pygame.image.load("D:\Prog\The runner\Images\Settings Button.png")
+    sett_img = pygame.transform.scale(sett_img,(100,50))
+    sett_contr_button = Button1(300,300,sett_img)
+    sett_contr_button.rect.x = xx + 100
+    sett_contr_button.rect.y = xx - 190
+    back2_contr_img = pygame.image.load("D:\Prog\The runner\Images\Back Button.png")
+    back2_contr_img = pygame.transform.scale(back2_contr_img,(70,40))
+    back_2contr_button = Button1(500,500,back2_contr_img)
+    back_2contr_button.rect.x = xx+105
+    back_2contr_button.rect.y = yy +250
+    back_contr_img = pygame.image.load("D:\Prog\The runner\Images\Back Button.png")
+    back_contr_img = pygame.transform.scale(back_contr_img,(70,40))
+    back_contr_button = Button1(500,500,back_contr_img)
+    back_contr_button.rect.x = xx + 105
+    back_contr_button.rect.y = yy + 250
+    bg_control = pygame.image.load("D:\Prog\The runner\\fundos\\back21.png")
+    bg_control = pygame.transform.scale(bg_control,(300,300))
+    controls_contr_img = pygame.image.load("D:\Prog\The runner\Images\Controls Button.png")
+    controls_contr_img = pygame.transform.scale(controls_contr_img,(100,50))
+    controls_button = Button1(300,300,controls_contr_img)
+    controls_button.rect.x = xx+100
+    controls_button.rect.y = yy+150
+    quit_button_img = pygame.image.load("D:\Prog\The runner\Images\Quit Button.png")
+    quit_button_img = pygame.transform.scale(quit_button_img,(100,40))
+    quit_button = Button1(300,300,quit_button_img)
+    quit_button.rect.x =  xx + 100
+    quit_button.rect.y = yy + 210
+    
+    font_f7 = pygame.font.Font('D:\Prog\The runner\Font\\rumbling\\Rumbling.ttf',9)
+    font_binds = pygame.font.FontType("D:\Prog\The runner\Font\monsters_heart\MonstersHeart-Regular.ttf",25)
+    font_button = pygame.font.Font('D:\Prog\The runner\Font\\rumbling\\Rumbling.ttf',30)
+    font_keys = pygame.font.FontType("D:\Prog\The runner\Font\monsters_heart\MonstersHeart-Regular.ttf",20)
+    
+    vol_txt = "General Sound"
+    fullsc_txt = "Fullscreen:"
+    check_fulls = "."
+    button_txt = "+"
+    min_vol = "-"
+    vol_max_shoot = "+"
+    vol_min_shoot = "-"
+    vol_max_damage = "+"
+    vol_min_damage = "-"
+    vol_min_bg = "-"
+    vol_max_bg = "+"
+    vol_min_hit = "-"
+    vol_max_hit = "+"
+    vol_min_coin = "-"
+    vol_max_coin = "+"
+    vol_min_lostp = "-"
+    vol_max_lostp = "+"
+    vol_min_heart = "-"
+    vol_masx_heart = "+"
+    txt_heart_sound = "Heart"
+    f7_fullsc = "or press f7"
+    txt_sound_shoot = "Shoot"
+    txt_sound_damage = "Attack"
+    txt_sound_bg = "Music"
+    txt_sound_hit = "Hit"
+    txt_sound_coin = "Coin"
+    txt_soun_lostpoints = "Lost Points"
+    mov_bind_msg = "Controls Keys"
+    left_txt = "Left:"
+    right_txt = "Right:"
+    up_txt = "Up:"
+    down_txt = "Down:"
+    shoot_txt = "Shoot:"
+    a_txt = "A"
+    d_txt = "D"
+    w_txt = "W"
+    s_txt = "S"
+    mov_bind_render= font_binds.render(mov_bind_msg,True,("#663399"))
+    mov_left_render = font_binds.render(left_txt,True,("#5F9EA0"))
+    mov_right_render = font_binds.render(right_txt,True,("#5F9EA0"))
+    mov_up_render = font_binds.render(up_txt,True,("#5F9EA0"))
+    mov_down_render = font_binds.render(down_txt,True,("#5F9EA0"))
+    shoot_render = font_binds.render(shoot_txt,True,("#5F9EA0"))
+    shoot_img = pygame.image.load("D:\Prog\The runner\Images\mouse-buttons-click-isolated-vector-drawing_csp83238793-removebg-preview.png")
+    shoot_img = pygame.transform.scale(shoot_img,(35,25))
+    bind_a_render = font_keys.render(a_txt,True,("#9400D3"))
+    binds_d_render = font_keys.render(d_txt,True,("#9400D3"))
+    binds_w_render = font_keys.render(w_txt,True,("#9400D3"))
+    binds_s_render = font_keys.render((s_txt),True,("#9400D3"))
+    heart_sound_render = font_keys.render(txt_heart_sound,True,("#CD853F"))
+    lostp_sound_render = font_binds.render(txt_soun_lostpoints,True,("#CD853F"))
+    coin_sound_render = font_binds.render(txt_sound_coin,True,("#CD853F"))
+    hit_sound_render = font_binds.render(txt_sound_hit,True,("#CD853F"))
+    bg_sound_render = font_binds.render(txt_sound_bg,True,("#CD853F"))
+    sound_damage_render = font_binds.render(txt_sound_damage,True,("#CD853F"))
+    txt_sound_shoot_render=font_binds.render(txt_sound_shoot,True,("#CD853F"))
+    f7_fullsc_render = font_f7.render(f7_fullsc,True,("#DAA520"))
+    check_fulls_render = font_binds.render(check_fulls,True,(255,0,0))
+    fullsc_render = font_binds.render(fullsc_txt,True,("#CD853F"))
+    vol_txt_render = font_binds.render(vol_txt,True,("#FFA500"))
+    min_vol_render  = font_button.render(min_vol,True,("#FF6347"))
+    vol_min_rect = min_vol_render.get_rect()
+    vol_min_rect.center= (545,257) 
+    vol_min_rect.width
+    vol_min_rect.height -= 25
+    txt_button_render = font_button.render(button_txt,True,("#FF6347"))
+    text_button_rect= txt_button_render.get_rect()
+    text_button_rect.center = (500,253)
+    text_button_rect.width 
+    text_button_rect.height -=15
+    vol_max_shoot_render = font_button.render(vol_max_shoot,True,("#FF6347"))
+    vol_max_shoot_button_rect = vol_max_shoot_render.get_rect()
+    vol_max_shoot_button_rect.center = (500,308)
+    vol_max_shoot_button_rect.width
+    vol_max_shoot_button_rect.height -= 20
+    vol_min_shoot_render = font_button.render(vol_min_shoot,True,("#FF6347"))
+    vol_min_shoot_button_rect = vol_min_shoot_render.get_rect()
+    vol_min_shoot_button_rect.center = (545,310)
+    vol_min_shoot_button_rect.width
+    vol_min_shoot_button_rect.height -= 25
+    vol_min_dam_render = font_button.render(vol_min_damage,True,("#FF6347"))
+    vol_min_dam_button_rect = vol_min_dam_render.get_rect()
+    vol_min_dam_button_rect.center = (635,310)
+    vol_min_dam_button_rect.width 
+    vol_min_dam_button_rect.height -=28
+    vol_max_dam_render = font_button.render(vol_max_damage,True,("#FF6347"))
+    vol_max_dam_button_rect = vol_max_dam_render.get_rect()
+    vol_max_dam_button_rect.center = (582,305)
+    vol_max_dam_button_rect.width 
+    vol_max_dam_button_rect.height -=20
+    vol_min_bg_render = font_button.render(vol_min_bg,True,("#FF6347"))
+    vol_min_bg_button_rect = vol_min_bg_render.get_rect()
+    vol_min_bg_button_rect.center = (547,362)
+    vol_min_bg_button_rect.width
+    vol_min_bg_button_rect.height -= 28
+    vol_max_bg_render = font_button.render(vol_max_bg,True,("#FF6347"))
+    vol_max_bg_button_rect = vol_min_bg_render.get_rect()
+    vol_max_bg_button_rect.center = (497,358)
+    vol_max_bg_button_rect.width
+    vol_max_bg_button_rect.height -= 20
+    vol_min_hit_render = font_button.render(vol_min_hit,True,("#FF6347"))
+    vol_min_hit_rect = vol_min_hit_render.get_rect()
+    vol_min_hit_rect.center = (725,310)
+    vol_min_hit_rect.width
+    vol_min_hit_rect.height -= 28
+    vol_max_hit_render = font_button.render(vol_max_hit,True,("#FF6347"))
+    vol_max_hit_rect = vol_max_hit_render.get_rect()
+    vol_max_hit_rect.center = (679,305)
+    vol_max_hit_rect.width
+    vol_max_hit_rect.height -= 20
+    vol_min_coin_render = font_button.render(vol_min_coin,True,("#FF6347"))
+    vol_min_coin_rect = vol_min_coin_render.get_rect()
+    vol_min_coin_rect.center = (636,360)
+    vol_min_coin_rect.width
+    vol_min_coin_rect.height -= 28
+    vol_max_coin_render = font_button.render(vol_max_coin,True,("#FF6347"))
+    vol_max_coin_rect = vol_max_coin_render.get_rect()
+    vol_max_coin_rect.center = (585,355)
+    vol_max_coin_rect.width
+    vol_max_coin_rect.height -= 20
+    vol_min_lostp_render = font_button.render(vol_min_lostp,True,("#FF6347"))
+    vol_min_lostp_rect = vol_min_lostp_render.get_rect()
+    vol_min_lostp_rect.center = (725,360)
+    vol_min_lostp_rect.width
+    vol_min_lostp_rect.height -=29
+    vol_max_lostp_render = font_button.render(vol_max_lostp,True,("#FF6347"))
+    vol_max_lostp_rect = vol_max_lostp_render.get_rect()
+    vol_max_lostp_rect.center = (680,360)
+    vol_max_lostp_rect.width
+    vol_max_lostp_rect.height -= 20
+    vol_min_heart_render = font_button.render(vol_min_heart,True,("#FF6347"))
+    vol_min_heart_rect = vol_min_heart_render.get_rect()
+    vol_min_heart_rect.center = (728,414)
+    vol_min_heart_rect.width
+    vol_min_heart_rect.height -=29
+    vol_max_heart_render = font_button.render(vol_masx_heart,True,("#FF6347"))
+    vol_max_heart_rect = vol_max_heart_render.get_rect()
+    vol_max_heart_rect.center = (680,409)
+    vol_max_heart_rect.width
+    vol_max_heart_rect.height -= 20
+    check_fulls_rect = check_fulls_render.get_width()
+    check_fulls_rect = check_fulls_render.get_rect()
+    check_fulls_rect.center = (610,379)
+    check_fulls_rect.width += 14
+    check_fulls_rect.height -=10
 
     #Configurações game over
     botao_hover = False 
@@ -635,7 +1356,8 @@ def play_game():
 
     # importa as defs do arquivo defs.py
     screen_login()
-    tela_inicio()
+    if check_close_home_screen == True:
+        tela_inicio()
     #num_coins = load_coins(email_value,cont_coin)
 
     bar_prog = 0
@@ -682,11 +1404,13 @@ def play_game():
             button_rect = pygame.Rect(self.x, self.y, self.text_rect.width + 10, self.text_rect.height + 10)
             if left_click and button_rect.collidepoint(mouse_pos) and self.enabled:
                pop_restart.play(maxtime=1000)
-               bg_music.stop()
+               sound_bg_1_channel.stop()       
                play_game() 
                return True
             else: 
                return 
+    
+    
     button = Button("JOGAR NOVAMENTE",0,600)
     clicked = False
     class Button_Quit:
@@ -728,96 +1452,414 @@ def play_game():
                   
                 return True
             else: 
-                return False            
+                return False  
+  
     button_quit1 = Button_Quit(x=1220,y=595,text_quit="SAIR",text_sair='')
     button1 = Button_Quit(x=100,y=100,text_sair='Aguarde...',text_quit='')
     text_display_time = None
     quit_clicked = False
-            
-    bg_music.play(-1) #Play background sound 
+    
+    spw_mov_alien = False
+    cont_vol = 0.1
+    up_vol_red_forest = False 
+    down_vol_red_forest = False
+    pygame.mixer.set_num_channels(16)
+    
+    play_sound_bg_2 = False
+    sound_bg_2 = pygame.mixer.Sound('D:\Prog\The runner\Sounds\Village Outskirts.wav')
+    sound_bg_2_channel = pygame.mixer.Channel(0)
+    sound_bg_2_channel.play(sound_bg_2,-1)
+    sound_bg_2_channel.pause()
+    
+    play_sound_bg_3 = False
+    sound_bg_3 = pygame.mixer.Sound('Sounds/20. Bandwidth Bandits.wav')
+    sound_bg_3_channel = pygame.mixer.Channel(1)
+    sound_bg_3_channel.play(sound_bg_3,-1)
+    sound_bg_3_channel.pause()
+    sound_bg_3.set_volume(0.5)
+    
+    play_sound_bg_4 = False
+    sound_bg_4 = pygame.mixer.Sound("D:\Prog\The runner\Sounds\\3. The Choir of the Stars.wav")
+    sound_bg_4_channel = pygame.mixer.Channel(2)
+    sound_bg_4_channel.play(sound_bg_4,-1)
+    sound_bg_4_channel.pause()
+    
+    play_sound_bg_5 = False
+    sound_bg_5 = pygame.mixer.Sound('D:\Prog\The runner\Sounds\Into the Dungeon.wav')
+    sound_bg_5_channel = pygame.mixer.Channel(3)
+    sound_bg_5_channel.play(sound_bg_5,-1)
+    sound_bg_5_channel.pause()
+    
+    play_sound_bg_6 = False
+    sound_bg_6 = pygame.mixer.Sound('D:\Prog\The runner\Sounds\Medieval Vol. 2 4.mp3')
+    sound_bg_6_channel = pygame.mixer.Channel(4)
+    sound_bg_6_channel.play(sound_bg_6,-1)
+    sound_bg_6_channel.pause()   
+    
+    play_sound_bg_7 = False
+    sound_bg_7 = pygame.mixer.Sound('D:\Prog\The runner\Sounds\Medieval Vol. 2 2.mp3')
+    sound_bg_7_channel = pygame.mixer.Channel(5)
+    sound_bg_7_channel.play(sound_bg_7,-1)
+    sound_bg_7_channel.pause()
+    
+    play_sound_bg_8 = False
+    sound_bg_8 = pygame.mixer.Sound('D:\Prog\The runner\Sounds\chiphead64 - 11pm.mp3')
+    sound_bg_8_channel = pygame.mixer.Channel(7)
+    sound_bg_8_channel.play(sound_bg_8,-1)
+    sound_bg_8_channel.pause()
+    
+    play_sound_bg_9 = False
+    sound_bg_9 = pygame.mixer.Sound('D:\Prog\The runner\Sounds\Cathedral Lagoon.wav')
+    sound_bg_9_channel = pygame.mixer.Channel(8)
+    sound_bg_9_channel.play(sound_bg_9,-1)
+    sound_bg_9_channel.pause()
+    
+    play_sound_bg_10 = False
+    sound_bg_10 = pygame.mixer.Sound('D:\Prog\The runner\Sounds\Town.ogg')
+    sound_bg_10_channel = pygame.mixer.Channel(9)
+    sound_bg_10_channel.play(sound_bg_10,-1)
+    sound_bg_10_channel.pause()
+    
+    play_sound_bg_1 = False
+    sound_bg_1 = pygame.mixer.Sound('D:\Prog\The runner\Sounds\\medie_sound.mp3')#BackGround Music
+    sound_bg_1_channel = pygame.mixer.Channel(10)
+    sound_bg_1_channel.play(sound_bg_1,-1)
+    sound_bg_1_channel.set_volume(volbg)
+    sound_bg_1_channel.pause()
+    
+    #sound_bg_4 = pygame.mixer.music.load('D:\Prog\The runner\Sounds\Medieval Vol. 2 4.mp3')
+    #sound_bg_4 = pygame.mixer.music.play()
+    #sound_bg_4 = pygame.mixer.music.unload()
+    #sound_bg_4 = pygame.mixer.music.set_volume(0.0) 
+    coold_fire_ball = 0
+    
     while loop: 
-        clock.tick(60)#FPS  
+        fps = clock.tick(60)#FPS 
         for event in pygame.event.get():
             if event.type == QUIT:
                 loop = False
                 pygame.quit() 
-    
-            # Teclas de movimento
             if event.type == KEYDOWN:
-                if event.key == K_w:
-                    mov_up = True
-                if event.key == K_a:
-                    mov_left = True
-                if event.key == K_d:
-                    mov_right = True
-                if event.key == K_s:
-                    mov_down = True
-            if event.type  == KEYUP:
-                if event.key == K_w:
-                    mov_up = False
-                if event.key == K_a:
-                    mov_left = False
-                if event.key == K_d:
-                    mov_right = False
-                if event.key == K_s: 
-                    mov_down = False
-                    
+                if event.key == K_p:
+                    game_pause = not game_pause
+                
+            # Teclas de movimento
+            if check_actions == True:
+                if event.type == KEYDOWN:
+                    spw_mov_alien = True
+                    if event.key == K_w:
+                        mov_up = True
+                    if event.key == K_a:
+                        mov_left = True
+                    if event.key == K_d:
+                        mov_right = True
+                    if event.key == K_s:
+                        mov_down = True
+                if event.type  == KEYUP:
+                    if event.key == K_w:
+                        mov_up = False
+                    if event.key == K_a:
+                        mov_left = False
+                    if event.key == K_d:
+                        mov_right = False
+                    if event.key == K_s: 
+                        mov_down = False
+            else:
+                mov_down = False
+                mov_left = False
+                mov_up = False
+                mov_right = False
+                
             #Controle fullscreen       
-            if event.type == KEYUP:
+            if event.type == KEYDOWN:
                 if event.key == K_F7:
-                    bg_rep = not bg_rep
-                    if bg_rep:
+                    check_click_fs = not check_click_fs
+                    contr_fullsr = not contr_fullsr
+                    if contr_fullsr:
                         tela = pygame.display.set_mode((info_tela_l,info_tela_a),pygame.FULLSCREEN)
                         tela_over = pygame.display.set_mode((info_tela_l,info_tela_a),pygame.FULLSCREEN)
                     else:
                         tela = pygame.display.set_mode((info_tela_l,info_tela_a))
-                        tela_over = pygame.display.set_mode((info_tela_l,info_tela_a))
-                                         
+                        tela_over = pygame.display.set_mode((info_tela_l,info_tela_a))       
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if vol_check == True:
+                        if text_button_rect.collidepoint(mouse_pos):
+                            cont_vol = round(cont_vol,1)
+                            if cont_vol < 1:
+                                cont_vol += 0.1
+                                sound_bg_1_channel.set_volume(cont_vol)
+                                sound_bg_2_channel.set_volume(cont_vol)
+                                sound_bg_3_channel.set_volume(cont_vol)
+                                sound_bg_4_channel.set_volume(cont_vol)
+                                sound_bg_5_channel.set_volume(cont_vol)
+                                sound_bg_6_channel.set_volume(cont_vol)
+                                sound_bg_7_channel.set_volume(cont_vol)
+                                sound_bg_8_channel.set_volume(cont_vol)
+                                sound_bg_9_channel.set_volume(cont_vol)
+                                sound_bg_10_channel.set_volume(cont_vol)
+                                fireball_effect.set_volume(cont_vol)
+                                hit.set_volume(cont_vol)
+                                damage = pygame.mixer.music.set_volume(cont_vol)
+                                coin_sound.set_volume(cont_vol)
+                                alien_right.set_volume(cont_vol)
+                                pop_restart.set_volume(cont_vol)
+                                game_over_sound.set_volume(cont_vol)
+                        if vol_min_rect.collidepoint(mouse_pos):
+                            cont_vol = round(cont_vol,1)
+                            if cont_vol > 0:
+                                cont_vol -= 0.1
+                                sound_bg_1_channel.set_volume(cont_vol)
+                                sound_bg_2_channel.set_volume(cont_vol)
+                                sound_bg_3_channel.set_volume(cont_vol)
+                                sound_bg_4_channel.set_volume(cont_vol)
+                                sound_bg_5_channel.set_volume(cont_vol)
+                                sound_bg_6_channel.set_volume(cont_vol)
+                                sound_bg_7_channel.set_volume(cont_vol)
+                                sound_bg_8_channel.set_volume(cont_vol)
+                                sound_bg_9_channel.set_volume(cont_vol)
+                                sound_bg_10_channel.set_volume(cont_vol)
+                                fireball_effect.set_volume(cont_vol)
+                                hit.set_volume(cont_vol)
+                                damage = pygame.mixer.music.set_volume(cont_vol)
+                                coin_sound.set_volume(cont_vol)
+                                alien_right.set_volume(cont_vol)
+                                sound_col_heart.set_volume(cont_vol)
+                        if vol_max_shoot_button_rect.collidepoint(mouse_pos):
+                            cont_shoot = round(cont_shoot,1)
+                            if cont_shoot < 1:
+                                cont_shoot += 0.1
+                                fireball_effect.set_volume(cont_shoot)
+                        if vol_min_shoot_button_rect.collidepoint(mouse_pos):
+                            cont_shoot = round(cont_shoot,1)
+                            if cont_shoot > 0:
+                                cont_shoot -= 0.1
+                                fireball_effect.set_volume(cont_shoot)
+                        if vol_min_dam_button_rect.collidepoint(mouse_pos):
+                            cont_damage_sound = round(cont_damage_sound,1)
+                            if cont_damage_sound > 0:
+                                cont_damage_sound -= 0.1
+                                damage = pygame.mixer.music.set_volume(cont_vol)
+                        if vol_max_dam_button_rect.collidepoint(mouse_pos):
+                            cont_damage_sound = round(cont_damage_sound,1)
+                            if cont_damage_sound < 1:
+                                cont_damage_sound += 0.1
+                                damage = pygame.mixer.music.set_volume(cont_vol)
+                        if vol_min_bg_button_rect.collidepoint(mouse_pos):
+                            cont_sound_bg = round(cont_sound_bg,1)
+                            if cont_sound_bg > 0:
+                                cont_sound_bg -= 0.1
+                                sound_bg_1_channel.set_volume(cont_sound_bg)
+                                sound_bg_2_channel.set_volume(cont_sound_bg)
+                                sound_bg_3_channel.set_volume(cont_sound_bg)
+                                sound_bg_4_channel.set_volume(cont_sound_bg)
+                                sound_bg_5_channel.set_volume(cont_sound_bg)
+                                sound_bg_6_channel.set_volume(cont_sound_bg)
+                                sound_bg_7_channel.set_volume(cont_sound_bg)
+                                sound_bg_8_channel.set_volume(cont_sound_bg)
+                                sound_bg_9_channel.set_volume(cont_sound_bg)
+                                sound_bg_10_channel.set_volume(cont_sound_bg)
+                        if vol_max_bg_button_rect.collidepoint(mouse_pos):
+                            cont_sound_bg = round(cont_sound_bg,1)
+                            if cont_sound_bg < 1:
+                                cont_sound_bg += 0.1
+                                sound_bg_1_channel.set_volume(cont_sound_bg)
+                                sound_bg_2_channel.set_volume(cont_sound_bg)
+                                sound_bg_3_channel.set_volume(cont_sound_bg)
+                                sound_bg_4_channel.set_volume(cont_sound_bg)
+                                sound_bg_5_channel.set_volume(cont_sound_bg)
+                                sound_bg_6_channel.set_volume(cont_sound_bg)
+                                sound_bg_7_channel.set_volume(cont_sound_bg)
+                                sound_bg_8_channel.set_volume(cont_sound_bg)
+                                sound_bg_9_channel.set_volume(cont_sound_bg)
+                                sound_bg_10_channel.set_volume(cont_sound_bg)
+                        if vol_min_hit_rect.collidepoint(mouse_pos):
+                            cont_sound_hit = round(cont_sound_hit,1)
+                            if cont_sound_hit > 0:
+                                cont_sound_hit -= 0.1
+                                hit.set_volume(cont_sound_hit)
+                        if vol_max_hit_rect.collidepoint(mouse_pos):
+                            cont_sound_hit = round(cont_sound_hit,1)
+                            if cont_sound_hit < 1:
+                                cont_sound_hit += 0.1
+                                hit.set_volume(cont_sound_hit)
+                        if vol_min_coin_rect.collidepoint(mouse_pos):
+                            cont_sound_coin = round(cont_sound_coin,1)
+                            if cont_sound_coin > 0:
+                                cont_sound_coin -= 0.1
+                                coin_sound.set_volume(cont_sound_coin)
+                        if vol_max_coin_rect.collidepoint(mouse_pos):
+                            cont_sound_coin = round(cont_sound_coin,1)
+                            if cont_sound_coin < 1:
+                                cont_sound_coin += 0.1
+                                coin_sound.set_volume(cont_coin_round)
+                        if vol_min_lostp_rect.collidepoint(mouse_pos):
+                            cont_sound_lostp = round(cont_sound_lostp,1)
+                            if cont_sound_lostp > 0:
+                                cont_sound_lostp -= 0.1
+                                alien_right.set_volume(cont_sound_lostp)
+                        if vol_max_lostp_rect.collidepoint(mouse_pos):
+                            cont_sound_lostp = round(cont_sound_lostp,1)
+                            if cont_sound_lostp < 1:
+                                cont_sound_lostp += 0.1
+                                alien_right.set_volume(cont_sound_lostp)
+                        if vol_min_heart_rect.collidepoint(mouse_pos):
+                          cont_sound_heart = round(cont_sound_heart,1)  
+                          if cont_sound_heart > 0:
+                              cont_sound_heart -= 0.1
+                              sound_col_heart.set_volume(cont_sound_heart)
+                        if vol_max_heart_rect.collidepoint(mouse_pos):
+                            cont_sound_heart = round(cont_sound_heart,1)
+                            if cont_sound_heart < 1:
+                                cont_sound_heart += 0.1
+                                sound_col_heart.set_volume(cont_sound_heart)
+                    if check_click_sett == True:
+                        if check_fulls_rect.collidepoint(mouse_pos):#fullscreen control by "button" on screen sett_contr
+                            check_click_fs = not check_click_fs
+                        if check_click_fs == False:
+                            tela = pygame.display.set_mode((info_tela_l,info_tela_a),pygame.FULLSCREEN) 
+                        else:
+                            tela = pygame.display.set_mode((info_tela_l,info_tela_a)) 
+
+            #print(down_vol_red_forest)                    
             if event.type == MOUSEBUTTONDOWN and event.button == 1:
-                fireball_effect.play()
-                triggered = True
-                vel_x_fire = 30
+                if check_actions == True:  
+                    curr_fire_ball = pygame.time.get_ticks()
+                    if curr_fire_ball - coold_fire_ball > 500:    
+                        if not triggered:
+                            blit_fire = True
+                            fire_channel.play(fireball_effect)
+                            triggered = True
+                            vel_x_fire = 30
+                            coold_fire_ball = curr_fire_ball
         pos_x_fire += vel_x_fire
-        if pos_x_fire > info_tela_l +100:
+        if blit_fire == False:
+            pos_x_fire += tela.get_width()
+        if pos_x_fire > info_tela_l or fire_col_al == True:
             respawn_fire()
-           
+        
+        if cont >= 0 and cont < 4:
+            play_sound_bg_1 = True
+            play_sound_bg_2 = False
+        if cont > 4 and cont < 6:
+            play_sound_bg_1 = False
+            play_sound_bg_2 = True
+            play_sound_bg_3 = False
+        if cont > 6 and cont < 8:
+            play_sound_bg_3 = True
+            play_sound_bg_2 = False 
+            play_sound_bg_4 = False 
+        if cont > 8 and cont < 10:
+            play_sound_bg_3 = False
+            play_sound_bg_4 = True 
+            play_sound_bg_5 = False  
+        if cont > 10 and cont < 12:
+            play_sound_bg_4 = False
+            play_sound_bg_5 = True
+            play_sound_bg_6 = False
+        if cont > 12 and cont < 14:
+            play_sound_bg_5 = False
+            play_sound_bg_6 = True
+            play_sound_bg_7 = False
+        if cont > 14 and cont < 16:
+            play_sound_bg_6 = False
+            play_sound_bg_7 = True
+            play_sound_bg_8 = False
+        if cont > 16 and cont < 18:
+            play_sound_bg_7 = False
+            play_sound_bg_8 = True
+            play_sound_bg_9 = False
+        if cont > 18 and cont < 20:
+            play_sound_bg_8 = False
+            play_sound_bg_9 = True
+            play_sound_bg_10 = False
+        if cont > 20 and cont < 22:
+            play_sound_bg_9 = False
+            play_sound_bg_10 = True
+        
+        if play_sound_bg_1 == True:
+            sound_bg_1_channel.unpause()
+        if play_sound_bg_1 == False:
+            sound_bg_1_channel.pause()        
+        if play_sound_bg_2 == True:
+            sound_bg_2_channel.unpause()
+        if play_sound_bg_2 == False:
+            sound_bg_2_channel.pause()
+        if play_sound_bg_3 == True:
+            sound_bg_3_channel.unpause()
+        if play_sound_bg_3 == False:
+            sound_bg_3_channel.pause()
+        if play_sound_bg_4 == True:
+            sound_bg_4_channel.unpause()
+        if play_sound_bg_4 == False:
+            sound_bg_4_channel.pause()
+        if play_sound_bg_5 == True:
+            sound_bg_5_channel.unpause()
+        if play_sound_bg_5 == False:
+            sound_bg_5_channel.pause()
+        if play_sound_bg_6 == True:
+            sound_bg_6_channel.unpause()
+        if play_sound_bg_6 == False:
+            sound_bg_6_channel.pause()
+        if play_sound_bg_7 == True:
+           sound_bg_7_channel.unpause()
+        if play_sound_bg_7 == False:
+            sound_bg_7_channel.pause()
+        if play_sound_bg_8 == True:
+            sound_bg_8_channel.unpause()
+        if play_sound_bg_8 == False:
+            sound_bg_8_channel.pause()
+        if play_sound_bg_9 == True:
+            sound_bg_9_channel.unpause()
+        if play_sound_bg_9 == False:
+            sound_bg_9_channel.pause()
+        if play_sound_bg_10 == True:
+            sound_bg_10_channel.unpause()
+        if play_sound_bg_10 == False:
+            sound_bg_10_channel.pause()
         #Controle de movimento
-        if bg_rep == True:
-            if mov_up and runner_rect.y > 0:
-                runner_rect.y -= 10
-                if not triggered:
-                    pos_y_fire -= 10
-            if mov_right and runner_rect.x < larg_tela - runner_rect.width-110: #Limitação da tela
-                runner_rect.x += 10
-                if not triggered:
-                    pos_x_fire += 10
-            if mov_left and runner_rect.x > 0:
-                runner_rect.x -= 10
-                if not triggered:
-                    pos_x_fire -= 10
-            if mov_down and runner_rect.y < alt_tela - runner_rect.height-85: #Limitação da tela
-                runner_rect.y += 10
-                if not triggered:
-                    pos_y_fire += 10
-                    
-        if bg_rep == False:
-            if mov_up and runner_rect.y > 0:
-                runner_rect.y -= 10
-                if not triggered:
-                    pos_y_fire -= 10
-            if mov_right and runner_rect.x < larg_tela - runner_rect.width-110: #Limitação da tela
-                runner_rect.x += 10
-                if not triggered:
-                    pos_x_fire += 10
-            if mov_left and runner_rect.x > 0:
-                runner_rect.x -= 10
-                if not triggered:
-                    pos_x_fire -= 10
-            if mov_down and runner_rect.y < alt_tela - runner_rect.height-85: #Limitação da tela
-                runner_rect.y += 10
-                if not triggered:
-                    pos_y_fire += 10
-                
+        if check_actions == True:
+            if bg_rep == True:
+                if mov_up and runner_rect.y > 0:
+                    runner_rect.y -= 10
+                    if not triggered:
+                        pos_y_fire -= 10
+                if mov_right and runner_rect.x < larg_tela - runner_rect.width-110: #Limitação da tela
+                    runner_rect.x += 10
+                    if not triggered:
+                        pos_x_fire += 10
+                if mov_left and runner_rect.x > 0:
+                    runner_rect.x -= 10
+                    if not triggered:
+                        pos_x_fire -= 10
+                if mov_down and runner_rect.y < alt_tela - runner_rect.height-85: #Limitação da tela
+                    runner_rect.y += 10
+                    if not triggered:
+                        pos_y_fire += 10
+                        
+            if bg_rep == False:
+                if mov_up and runner_rect.y > 0:
+                    runner_rect.y -= 10
+                    if not triggered:
+                        pos_y_fire -= 10
+                if mov_right and runner_rect.x < larg_tela - runner_rect.width-110: #Limitação da tela
+                    runner_rect.x += 10
+                    if not triggered:
+                        pos_x_fire += 10
+                if mov_left and runner_rect.x > 0:
+                    runner_rect.x -= 10
+                    if not triggered:
+                        pos_x_fire -= 10
+                if mov_down and runner_rect.y < alt_tela - runner_rect.height-85: #Limitação da tela
+                    runner_rect.y += 10
+                    if not triggered:
+                        pos_y_fire += 10   
+        else:
+            bg_rep = False
+            
+        
         #Tela e movimento da tela / (x) movimento de todos os fundos
         real_x = x % fundo.get_rect().width
         if cont < 10 and real_x < info_tela_l :
@@ -859,8 +1901,15 @@ def play_game():
         elif cont >= 90 and cont < 100 and real_x < info_tela_l:
             tela.blit(fundo10,(real_x,pos_y_fundo5))
             tela.blit(fundo10,(real_x - fundo10.get_rect().width,pos_y_fundo5))
-            x-=2 
+            x-=2
         
+        #Control bar_life_boss
+        if alien_boss_spw == True:
+            boss_health = 150
+            max_health = 150
+            draw_life_bar(boss_health,max_health)
+            tela.blit(render_name_boss, (pos_x_name_boss + 95,bar_y -30))
+
         #Controle bg_coin_count/coin_image2
         if bg_rep == True:
             tela.blit(bg_coin_count,(1080,0)) 
@@ -868,39 +1917,183 @@ def play_game():
         else:
             tela.blit(bg_coin_count,(1080,0))
             tela.blit(coin_image2,(1200,-9))
-
-        # Cria novos aliens
-        verificar_quantidade_aliens()
-
-        # Atualiza a posição dos aliens e os desenha na tela
-        for alien in aliens:
-            alien['rect'].x -= alien['speed']
-            if alien['rect'].right < 0:  # Verifica se o alien saiu da tela
-                alien['rect'].x = tela.get_width()  # Reinicia a posição do alien para a direita da tela
-
-        if triggered:
-            for alien in aliens:
-                if fire_rect.colliderect(alien['rect']):
-                    damage.play()
-                    aliens.remove(alien)
-                    cont += 1
-                    triggered = False
-                    break
-                
-        for alien in aliens:
-            if cont >= 11:
-                #alien['speed'] = random. randint(3,8)
-                pass
+        blit_rect_run = runner_rect 
+        tela.blit(runner,runner_rect)
         
-        colidir = colisao()
+        if spw_mov_alien == True:
+            verificar_quantidade_aliens()
+            
+    
+        
+        set_button_img_draw.draw1() 
+        #pygame.draw.rect(tela,(255,255,0),set_button_img_draw,2) 
+        if contr_menu == True:
+            pygame.draw.rect(tela,'MidnightBlue',[xx,yy,larg_ret,alt_ret]) 
+            tela.blit(bg_control,(xx,yy))
+            control_img_button.draw1()   
+            sett_contr_button.draw1()
+            sett_contr_click = True
+            controls_click = True
+            controls_contr_click = True
+            vol_check = False
+            quit_check_clicked = True
+            controls_button.draw1()
+            quit_button.draw1()
+        if sett_contr == True:
+            contr_menu = False 
+            controls_contr_click = False
+            vol_check = True
+            quit_check_clicked = False
+            pygame.draw.rect(tela,'black',[xx,yy,larg_ret,alt_ret])
+            tela.blit(bg_control,(xx,yy))
+            tela.blit(vol_txt_render,(xx,yy))
+            tela.blit(txt_button_render,(xx,yy+17))
+            tela.blit(min_vol_render,(xx+50,yy+17))
+            tela.blit(vol_max_shoot_render,(xx,yy+70))
+            tela.blit(vol_min_shoot_render,(xx+51,yy+70))
+            tela.blit(vol_max_dam_render,(xx+85,yy+69))
+            tela.blit(vol_min_dam_render,(xx+140,yy+69))
+            tela.blit(vol_min_bg_render,(xx+50,yy+120))
+            tela.blit(vol_max_bg_render,(xx,yy+120))
+            tela.blit(vol_min_hit_render,(xx+230,yy+69))
+            tela.blit(vol_max_hit_render,(xx+180,yy+69))
+            tela.blit(vol_min_coin_render,(xx+140,yy+119))
+            tela.blit(vol_max_coin_render,(xx+86,yy+119))
+            tela.blit(vol_min_lostp_render,(xx+230,yy+119))
+            tela.blit(vol_max_lostp_render,(xx+181,yy+121))
+            tela.blit(vol_max_heart_render,(xx+181,yy+171))
+            tela.blit(vol_min_heart_render,(xx+231,yy+171))
+            tela.blit(fullsc_render,(xx,yy+150)) 
+            tela.blit(check_fulls_render,(xx+120,yy+145))
+            tela.blit(f7_fullsc_render,(xx,yy+170))
+            tela.blit(txt_sound_shoot_render,(xx,yy+50))
+            tela.blit(sound_damage_render,(xx+85,yy+50))
+            tela.blit(bg_sound_render,(xx,yy+100))
+            tela.blit(hit_sound_render,(xx+190,yy+50))
+            tela.blit(coin_sound_render,(xx+85,yy+100))
+            tela.blit(lostp_sound_render,(xx+165,yy+100))
+            tela.blit(heart_sound_render,(xx +190,yy+152 ))
+            pygame.draw.rect(tela,("gray"),check_fulls_rect,10)
+            back_2contr_button.draw1()
+            if check_click_sett == True:
+                if check_click_fs == True:
+                    pygame.draw.rect(tela,'#583e4d',[xx+120,yy+157,15,14])
+                else: 
+                    pygame.draw.rect(tela,'green',[xx+120,yy+157,15,14])
+            cont_vol_round =round(cont_vol,1)
+            cont_vol_render = font_binds.render(str(cont_vol_round),True,("#D2691E"))
+            cont_shoot_round= round(cont_shoot,1)
+            cont_shoot_render = font_binds.render(str(cont_shoot_round),True,("#D2691E"))
+            cont_damage_round = round(cont_damage_sound,1)
+            cont_damage_render = font_binds.render(str(cont_damage_round),True,("#D2691E"))
+            cont_bg_round = round(cont_sound_bg,1)
+            cont_bg_render = font_binds.render(str(cont_bg_round),True,("#D2691E"))
+            cont_hit_round = round(cont_sound_hit,1)
+            cont_hit_render = font_binds.render(str(cont_hit_round),True,("#D2691E"))
+            cont_coin_round = round(cont_sound_coin,1)
+            cont_coin_render = font_binds.render(str(cont_coin_round),True,("#D2691E"))
+            cont_lostp_round = round(cont_sound_lostp,1)
+            cont_lostp_render = font_binds.render(str(cont_lostp_round),True,("#D2691E"))
+            cont_heart_round = round(cont_sound_heart,1)
+            cont_heart_render = font_binds.render(str(cont_heart_round),True,("#D2691E"))
+            #pygame.draw.rect(tela,'green',vol_min_heart_rect,1)
+            tela.blit(cont_heart_render,(xx+200,yy+176))
+            tela.blit(cont_lostp_render,(xx+200,yy +126))
+            tela.blit(cont_coin_render,(xx+106,yy+125))
+            tela.blit(cont_hit_render,(xx+200,yy+75))
+            tela.blit(cont_bg_render,(xx+20,yy+127))
+            tela.blit(cont_damage_render,(xx+105,yy+75))
+            tela.blit(cont_shoot_render,(xx+20,yy+75))
+            tela.blit(cont_vol_render,(xx+20,yy+23))
+        if controls_true == True:
+            quit_check_clicked = False
+            tela.blit(bg_control,(xx,yy))
+            back_contr_button.draw1()
+            tela.blit(mov_bind_render,(xx,yy))
+            tela.blit(mov_up_render,(xx,yy+40))
+            tela.blit(binds_w_render,(xx+40,yy+45))
+            tela.blit(mov_left_render,(xx,yy+70))
+            tela.blit(bind_a_render,(xx+62,yy+75))
+            tela.blit(mov_down_render,(xx,yy+98))
+            tela.blit(binds_s_render,(xx+64,yy+103))
+            tela.blit(mov_right_render,(xx,yy+126))
+            tela.blit(binds_d_render,(xx+65,yy+130))
+            tela.blit(shoot_render,(xx,yy+154))
+            tela.blit(shoot_img,(xx+65,yy+156))
+        #print(cont_shoot)
+        if game_pause == True:
+            fireball_effect.stop()
+            continue
+        
+        # Atualiza a posição dos aliens e os desenha na tela
+        if check_actions == True:
+            for alien in aliens:
+                alien['rect'].x -= alien['speed']
+                if alien['rect'].right < 0:  # Verifica se o alien saiu da tela
+                    alien['rect'].x = tela.get_width() # Reinicia a posição do alien para a direita da tela   
+                for alien in aliens:
+                    if cont >= 11:
+                        #alien['speed'] = random. randint(3,8)
+                        pass
+        
+        if contr_alien_pos == True and life_alien > 0:
+            if check_actions == True:
+                    for alien in aliens:
+                        alien['rect'].x += 10 #alien['speed']  # Altera o sinal de subtração para adição
+                        if alien['rect'].left >= larg_tela - 200:  # Verifica se o alien saiu da tela pelo lado direito
+                            contr_alien_pos_2 = True
+                            contr_alien_pos = False
+                        if alien_boss_spw == True:
+                            if 'moving_up' not in alien and 'moving_down' not in alien: #Checks if the alien is moving vertically
+                                if random.choice([True, False]):  #Randomly choose a vertical direction
+                                    alien['moving_up'] = True
+                                else:
+                                    alien['moving_down'] = True  
+                            if 'moving_up' in alien: #Vertical movement
+                                alien['rect'].y -= 10  #or alien['speed'] if you prefer
+                                if alien['rect'].top <= 0:
+                                    del alien['moving_up'] #The alien has reached the top of the screen, stop climbing
+                            elif 'moving_down' in alien:
+                                alien['rect'].y += 10 #or alien['speed'] if you prefer
+                                if alien['rect'].bottom >= alt_tela:
+                                    del alien['moving_down'] #The alien has reached the bottom of the screen, stop descending
+                      
+        if contr_alien_pos_2 == True and life_alien > 0: 
+            if check_actions == True:
+                    for alien in aliens:
+                        alien['rect'].x -= 15 #alien['speed']  # Altera o sinal de subtração para adição
+                        if alien['rect'].left <= 0:  # Verifica se o alien saiu da tela pelo lado direito 
+                            contr_alien_pos = True
+                            contr_alien_pos_2 = False
+                        if alien_boss_spw == True:   
+                            if 'moving_up' not in alien and 'moving_down' not in alien: #Checks if the alien is moving vertically
+                                if random.choice([True, False]):  #Randomly choose a vertical direction
+                                    alien['moving_up'] = True
+                                else:
+                                    alien['moving_down'] = True  
+                            if 'moving_up' in alien: #Vertical movement
+                                alien['rect'].y -= 5  #or alien['speed'] if you prefer
+                                if alien['rect'].top <= 0:
+                                    del alien['moving_up'] #The alien has reached the top of the screen, stop climbing
+                            elif 'moving_down' in alien:
+                                alien['rect'].y += 5  #or alien['speed'] if you prefer
+                                if alien['rect'].bottom >= alt_tela:
+                                    del alien['moving_down'] #The alien has reached the bottom of the screen, stop descending
+
+        if check_actions == True:
+            colisao()
+                
+        #pygame.draw.rect(tela,(255,255,0),fire_rect,2)
+        #pygame.draw.rect(tela,(255,255,0),runner_rect,2)
+        
         exibir_cont()
         #Controle de colisão e text COIN
         if runner_mask.overlap(coin_mask,coin_over): # ativa o sound quando há uma colisão 
             sound_coin()
             num_coins += 1
             cont_limit += 1 
-            save_info_coins(email_value,num_coins)
-            show_msg = True
+            if control == True:
+                save_info_coins(email_value,num_coins)
             msg_time =pygame.time.get_ticks() 
         time_atual = pygame.time.get_ticks()    
         if show_msg:
@@ -924,29 +2117,35 @@ def play_game():
             esp_coin = False  
         
         #posição rect
-        for alien in aliens:
-            tela.blit(alien['image'], alien['rect'])
-
-        if triggered:
-            fireball_pos = (pos_x_fire, pos_y_fire + 40)  # Define a posição da fireball
-            fire_rect.topleft = fireball_pos
-            tela.blit(fireball, fireball_pos)
-            
-        for alien in aliens:
-            tela.blit(alien['image'], alien['rect'])
-            
-        tela.blit(runner,runner_rect)
+        if spw_mov_alien == True:
+            for alien in aliens:
+                tela.blit(alien['image'], alien['rect'])
+            if triggered and fire_col_al == False:
+                fireball_pos = (pos_x_fire+40, pos_y_fire + 40)  # Define a posição da fireball
+                fire_rect.topleft= fireball_pos
+                tela.blit(fireball, fireball_pos)   
+        
         #Desenha os corações na tela
         for i, heart_image in enumerate(hearts_image):
             heart_rect = heart_image.get_rect()
             heart_rect.x = 1 + i * (heart_rect.width-5)
             heart_rect.y = 0
             tela.blit(heart_image, heart_rect)  
-
+        
         #Blit tela game over/stop sounds
         if hearts == 0:
-            bg_music.stop()
-            damage.stop()
+            sound_bg_1_channel.stop()
+            sound_bg_1_channel.stop()
+            sound_bg_2_channel.stop()
+            sound_bg_3_channel.stop()
+            sound_bg_4_channel.stop()
+            sound_bg_5_channel.stop()
+            sound_bg_6_channel.stop()
+            sound_bg_7_channel.stop()
+            sound_bg_8_channel.stop()
+            sound_bg_9_channel.stop()
+            sound_bg_10_channel.stop()
+            damage = pygame.mixer.music.stop()
             hit.stop()
             fireball_effect.stop()
             coin_sound.stop()
